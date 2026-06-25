@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}{{ email.subject|default:"[NO HEADER]" }} - EmailScout{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="mb-3">
+            <a href="/emails/" class="btn btn-outline-primary btn-sm code-font"><i class="fas fa-arrow-left me-2"></i>RETURN TO DATA STREAM</a>
+        </div>
+        
+        <div class="card border-0" style="border-top: 2px solid {% if email.is_scam %}var(--accent){% elif email.opportunity_type and email.opportunity_type != 'none' %}var(--secondary){% else %}var(--primary){% endif %};">
+            <div class="card-header border-bottom-0 py-4 d-flex justify-content-between align-items-start">
+                <div>
+                    <h4 class="mb-2 text-white" style="text-shadow: 0 0 10px rgba(255,255,255,0.2);">{{ email.subject|default:"[NO HEADER]" }}</h4>
+                    <div class="text-muted small code-font">
+                        <i class="fas fa-broadcast-tower me-1 text-primary"></i> SOURCE: <strong><span class="text-white">{{ email.sender_name }}</span></strong> &lt;{{ email.sender_email }}&gt;
+                    </div>
+                </div>
+                <div class="text-end">
+                    {% if email.received_at %}
+                    <div class="text-muted small code-font mb-1">
+                        <i class="fas fa-clock me-1"></i> {{ email.received_at|date:"Y-m-d H:i:s" }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if email.is_scam %}
+                        <span class="badge badge-scam px-3 py-2"><i class="fas fa-biohazard me-1"></i> THREAT IDENTIFIED</span>
+                    {% elif email.is_scam == False %}
+                        <span class="badge badge-safe px-3 py-2"><i class="fas fa-check-circle me-1"></i> SIGNAL CLEAR</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card-body p-4" style="background: rgba(0,0,0,0.2);">
+                {% if email.is_scam %}
+                <div class="alert mb-4 border-0" style="background: rgba(255,0,60,0.1); border-left: 4px solid var(--accent) !important; color: #ff4d6d;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                        <div>
+                            <h6 class="mb-1 fw-bold code-font text-white">SECURITY ALERT</h6>
+                            <p class="mb-0 small">This communication has been flagged by our heuristic engines as a potential threat. Do not interact with links or attachments.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if email.opportunity_type and email.opportunity_type != 'none' %}
+                <div class="alert mb-4 border-0 d-flex justify-content-between align-items-center" style="background: rgba(112,0,255,0.1); border-left: 4px solid var(--secondary) !important; color: #b07cff;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star fa-2x me-3" style="text-shadow: 0 0 10px var(--secondary);"></i>
+                        <div>
+                            <h6 class="mb-1 fw-bold code-font text-white">OPPORTUNITY DETECTED: {{ email.opportunity_type|upper }}</h6>
+                            <div class="small">
+                                {% if email.deadline %}<i class="fas fa-hourglass-half me-1 text-warning"></i> Deadline: <span class="text-white me-3">{{ email.deadline }}</span>{% endif %}
+                                <i class="fas fa-chart-line me-1 text-primary"></i> Target Match Profile
+                            </div>
+                        </div>
+                    </div>
+                    {% if email.relevance_score %}
+                    <div class="text-end ps-3 border-start border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
+                        <div class="text-white-50 small code-font mb-1">RELEVANCE</div>
+                        <h3 class="mb-0 text-white code-font fw-bold" style="text-shadow: 0 0 10px var(--primary);">{{ email.relevance_score|floatformat:1 }}<span class="fs-6 text-muted">/10</span></h3>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="p-4 rounded code-font" style="background: rgba(11, 15, 25, 0.8); border: 1px solid rgba(255,255,255,0.05);">
+                    <div class="text-muted small mb-3 border-bottom border-secondary pb-2" style="border-color: rgba(255,255,255,0.1) !important;"><i class="fas fa-terminal me-2"></i>RAW DECRYPTED PAYLOAD</div>
+                    <pre style="white-space: pre-wrap; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6; color: #d1d5db; margin: 0;">{{ email.body_full|default:email.body_preview }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

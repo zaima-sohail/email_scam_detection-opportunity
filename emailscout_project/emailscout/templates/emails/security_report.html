@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Security Report - EmailScout{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="text-white m-0" style="text-shadow: 0 0 15px rgba(255, 0, 60, 0.5);">
+            <i class="fas fa-shield-virus text-danger me-2" style="animation: pulse 2s infinite;"></i>THREAT INTELLIGENCE
+        </h2>
+        <a href="{% url 'email_list' %}" class="btn btn-outline-primary btn-sm code-font"><i class="fas fa-arrow-left me-2"></i>RETURN TO DASHBOARD</a>
+    </div>
+</div>
+
+<div class="row mb-4 g-4">
+    <div class="col-md-4">
+        <div class="card text-center border-0" style="border-top: 2px solid var(--primary);">
+            <div class="card-body py-4 position-relative overflow-hidden">
+                <i class="fas fa-radar fa-4x text-primary mb-3" style="opacity: 0.2; position: absolute; right: -10px; bottom: -10px;"></i>
+                <h3 class="card-title code-font text-primary display-5 fw-bold" style="text-shadow: 0 0 15px var(--primary);">{{ total_scanned }}</h3>
+                <p class="text-muted mb-0 code-font text-uppercase letter-spacing-1">Packets Scanned</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-0" style="border-top: 2px solid var(--success);">
+            <div class="card-body py-4 position-relative overflow-hidden">
+                <i class="fas fa-check-circle fa-4x text-success mb-3" style="opacity: 0.2; position: absolute; right: -10px; bottom: -10px;"></i>
+                <h3 class="card-title code-font text-success display-5 fw-bold" style="text-shadow: 0 0 15px var(--success);">{{ safe_count }}</h3>
+                <p class="text-muted mb-0 code-font text-uppercase letter-spacing-1">Clear Signals</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-0" style="border-top: 2px solid var(--accent); background: rgba(255, 0, 60, 0.05);">
+            <div class="card-body py-4 position-relative overflow-hidden">
+                <i class="fas fa-biohazard fa-4x text-danger mb-3" style="opacity: 0.2; position: absolute; right: -10px; bottom: -10px; animation: pulse 2s infinite;"></i>
+                <h3 class="card-title code-font text-danger display-5 fw-bold" style="text-shadow: 0 0 15px var(--accent);">{{ scam_count }}</h3>
+                <p class="text-muted mb-0 code-font text-uppercase letter-spacing-1">Anomalies Detected</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Threat Metrics Row -->
+<div class="row mb-4 g-4">
+    <div class="col-md-4">
+        <div class="card text-center border-0" style="border-top: 2px solid var(--warning);">
+            <div class="card-body py-4 position-relative overflow-hidden">
+                <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3" style="opacity: 0.2; position: absolute; right: -10px; bottom: -10px;"></i>
+                <h3 class="card-title code-font text-warning display-5 fw-bold" style="text-shadow: 0 0 15px var(--warning);">{{ high_severity_count }}</h3>
+                <p class="text-muted mb-0 code-font text-uppercase letter-spacing-1">High Severity</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-0" style="border-top: 2px solid var(--info);">
+            <div class="card-body py-4 position-relative overflow-hidden">
+                <i class="fas fa-flag fa-4x text-info mb-3" style="opacity: 0.2; position: absolute; right: -10px; bottom: -10px;"></i>
+                <h3 class="card-title code-font text-info display-5 fw-bold" style="text-shadow: 0 0 15px var(--info);">{{ flagged_count }}</h3>
+                <p class="text-muted mb-0 code-font text-uppercase letter-spacing-1">User Flagged</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0" style="border-top: 2px solid var(--accent);">
+    <div class="card-header border-bottom-0 pt-4 pb-3">
+        <h5 class="mb-0 text-white code-font"><i class="fas fa-list-ul text-danger me-2"></i>ISOLATED THREATS LOG</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if recent_scams %}
+        <div class="table-responsive">
+            <table class="table table-hover table-dark table-borderless align-middle m-0 code-font" style="background: transparent;">
+                <thead style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <tr class="text-muted small">
+                        <th class="ps-4 py-3">IDENTIFIER</th>
+                        <th>SOURCE</th>
+                        <th>SEVERITY</th>
+                        <th>THREAT LEVEL</th>
+                        <th>VECTORS</th>
+                        <th class="pe-4">TIMESTAMP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for email in recent_scams %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;">
+                        <td class="ps-4 py-3">
+                            <a href="{% url 'email_detail' email.id %}" class="text-decoration-none fw-bold text-white">
+                                {{ email.subject|default:"[NO HEADER]"|truncatechars:40 }}
+                            </a>
+                        </td>
+                        <td class="text-muted small">{{ email.sender_email }}</td>
+                        <td>
+                            {% if email.severity_list %}
+                                {% for severity in email.severity_list %}
+                                    {% if 'high' in severity %}
+                                        <span class="badge bg-danger">HIGH</span>
+                                    {% elif 'medium' in severity %}
+                                        <span class="badge bg-warning">MEDIUM</span>
+                                    {% else %}
+                                        <span class="badge bg-info">{{ severity|upper }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="badge bg-secondary">NORMAL</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.1); max-width: 100px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: {% widthratio email.scam_confidence 1 100 %}%; box-shadow: 0 0 8px var(--accent);"></div>
+                                </div>
+                                <span class="text-danger small fw-bold">{% widthratio email.scam_confidence 1 100 %}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <ul class="mb-0 ps-3 small text-warning list-unstyled">
+                                {% for reason in email.parsed_reasons %}
+                                <li><i class="fas fa-angle-right me-1 text-danger"></i>{{ reason }}</li>
+                                {% empty %}
+                                <li><i class="fas fa-angle-right me-1 text-danger"></i>Heuristic match</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td class="text-muted small pe-4">{{ email.received_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shield-check fa-4x text-success mb-3" style="text-shadow: 0 0 20px var(--success);"></i>
+            <h5 class="text-white letter-spacing-1">SYSTEM SECURE</h5>
+            <p class="text-muted code-font">No active threats detected in current cycle.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- User Flagged Emails Section -->
+{% if flagged_by_user %}
+<div class="card shadow-sm border-0 mt-4" style="border-top: 2px solid var(--info);">
+    <div class="card-header border-bottom-0 pt-4 pb-3">
+        <h5 class="mb-0 text-white code-font"><i class="fas fa-flag text-info me-2"></i>USER-FLAGGED THREATS</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-dark table-borderless align-middle m-0 code-font" style="background: transparent;">
+                <thead style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <tr class="text-muted small">
+                        <th class="ps-4 py-3">IDENTIFIER</th>
+                        <th>SOURCE</th>
+                        <th>USER REASON</th>
+                        <th class="pe-4">TIMESTAMP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for email in flagged_by_user %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;">
+                        <td class="ps-4 py-3">
+                            <a href="{% url 'email_detail' email.id %}" class="text-decoration-none fw-bold text-white">
+                                {{ email.subject|default:"[NO HEADER]"|truncatechars:40 }}
+                            </a>
+                        </td>
+                        <td class="text-muted small">{{ email.sender_email }}</td>
+                        <td class="text-info small">{{ email.flagged_reason|default:"Manual review requested" }}</td>
+                        <td class="text-muted small pe-4">{{ email.received_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

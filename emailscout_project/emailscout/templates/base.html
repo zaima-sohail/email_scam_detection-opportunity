@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EmailScout{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Rajdhani:wght@500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface: #111827;
+            --surface-glass: rgba(17, 24, 39, 0.7);
+            --primary: #00f0ff;
+            --secondary: #7000ff;
+            --accent: #ff003c;
+            --success: #00ff66;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-glow: 0 0 10px rgba(0, 240, 255, 0.3);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        body { 
+            background-color: var(--bg-color); 
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Navbar */
+        .navbar { 
+            background: var(--surface-glass) !important; 
+            backdrop-filter: blur(12px);
+            border-bottom: var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand { 
+            color: var(--primary) !important; 
+            font-weight: 700; 
+            font-size: 1.6rem; 
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+        }
+        .navbar-brand i { color: var(--primary); }
+        /* Cards */
+        .card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(10px);
+            border: var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .card:hover {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: var(--glass-border);
+            color: var(--text-main);
+        }
+        /* Badges */
+        .badge {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 0.4em 0.8em;
+            border-radius: 4px;
+        }
+        .badge-scam { background: rgba(255, 0, 60, 0.2); color: #ff4d6d; border: 1px solid #ff003c; box-shadow: 0 0 8px rgba(255, 0, 60, 0.3); }
+        .badge-safe { background: rgba(0, 255, 102, 0.2); color: #00ff66; border: 1px solid #00ff66; box-shadow: 0 0 8px rgba(0, 255, 102, 0.3); }
+        .badge-opportunity { background: rgba(112, 0, 255, 0.2); color: #b07cff; border: 1px solid #7000ff; box-shadow: 0 0 8px rgba(112, 0, 255, 0.3); }
+        /* Buttons */
+        .btn-primary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1), 0 0 10px rgba(0, 240, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary);
+        }
+        .btn-outline-danger {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .btn-outline-danger:hover {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent);
+        }
+        .btn-danger {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.3);
+        }
+        .btn-danger:hover {
+            background: #d40032;
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.6);
+        }
+        .btn-outline-secondary {
+            color: var(--text-muted);
+            border-color: var(--text-muted);
+        }
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        
+        .text-muted { color: var(--text-muted) !important; }
+        
+        /* Cybersecurity scanning effect line */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+            opacity: 0.5;
+            z-index: 9999;
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scan {
+            0% { top: -10px; }
+            100% { top: 100%; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="scan-line"></div>
+{% if user.is_authenticated %}
+<nav class="navbar navbar-dark px-4 py-3 sticky-top">
+    <a class="navbar-brand d-flex align-items-center" href="/emails/">
+        <i class="fas fa-radar me-2" style="animation: pulse 2s infinite;"></i>
+        Email<span class="text-white">Scout</span>_
+    </a>
+    <div class="d-flex align-items-center gap-4">
+        <a href="{% url 'email_list' %}" class="text-decoration-none" style="color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; transition: color 0.3s;"><i class="fas fa-inbox me-1"></i> Dashboard</a>
+        <a href="{% url 'security_report' %}" class="text-decoration-none" style="color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; transition: color 0.3s;"><i class="fas fa-shield-virus me-1"></i> Sec-Report</a>
+        <a href="{% url 'opportunities_board' %}" class="text-decoration-none" style="color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; transition: color 0.3s;"><i class="fas fa-briefcase me-1"></i> Opp-Radar</a>
+        <a href="{% url 'profile' %}" class="text-decoration-none" style="color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; transition: color 0.3s;"><i class="fas fa-user-graduate me-1"></i> Profile</a>
+        <div class="border-start border-secondary ps-4 d-flex align-items-center gap-3">
+            <span class="text-muted small code-font"><i class="fas fa-user-astronaut me-1"></i> {{ user.username }}</span>
+            <a href="/auth/logout/" class="btn btn-outline-danger btn-sm code-font px-3">LOGOUT</a>
+        </div>
+    </div>
+</nav>
+<style>
+    @keyframes pulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 15px var(--primary); } 100% { opacity: 0.7; transform: scale(1); } }
+    .navbar a:hover { color: var(--primary) !important; text-shadow: 0 0 8px var(--primary); }
+</style>
+{% endif %}
+
+<div class="container-fluid py-4 px-4 px-md-5">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--primary); color: var(--text-main);">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
